@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Market {
+  id                 String   @id @default(uuid())
+  question           String
+  description        String   @db.Text
+  imageUrl           String
+  blockchainMarketId Int      @unique
+  totalPoolSize      String
+  totalYieldUntilEnd String
+  endDate            DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  author        Author       @relation(fields: [authorId], references: [id])
+  authorId      String
+  post          Post?
+  engagement    Engagement?
+  source        Source?
+  probability   Probability? @relation(fields: [probabilityId], references: [id])
+  probabilityId String?
+  protocol      Protocol?    @relation(fields: [protocolId], references: [id])
+  protocolId    String?
+  token         Token?       @relation(fields: [tokenId], references: [id])
+  tokenId       String?
+  tvl           Tvl?         @relation(fields: [tvlId], references: [id])
+  tvlId         String?
+  actions       Action[]
+
+  @@index([blockchainMarketId])
+  @@index([createdAt])
+}
+
+model Tvl {
+  id        String   @id @default(uuid())
+  value     Float
+  symbol    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  markets Market[]
+}
+
+model Probability {
+  id        String   @id @default(uuid())
+  value     Int
+  unit      String   @default("percent")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  markets Market[]
+}
+
+model Author {
+  id             String   @id @default(uuid())
+  name           String
+  username       String   @unique
+  userId         String   @unique
+  avatar         String
+  verifiedGov    Boolean  @default(false)
+  verifiedBlue   Boolean  @default(false)
+  verifiedOrange Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  markets Market[]
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  pid       String   @unique
+  text      String   @db.Text
+  banner    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  marketId String @unique
+}
+
+model Engagement {
+  id        String   @id @default(uuid())
+  replies   Int      @default(0)
+  reposts   Int      @default(0)
+  likes     Int      @default(0)
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  marketId String @unique
+}
+
+model Source {
+  id        String   @id @default(uuid())
+  platform  String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  marketId String @unique
+}
+
+model Protocol {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  icon      String
+  apy       Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  markets Market[]
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  icon      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  markets Market[]
+}
+
+model Action {
+  id        String   @id @default(uuid())
+  label     String
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  marketId String
+
+  @@index([marketId])
+}
