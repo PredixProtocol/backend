@@ -71,6 +71,16 @@ const mockPostResponse: GetPostByPidXResponse = {
               },
               tipjar_settings: { is_enabled: false },
               super_follow_eligible: false,
+              verification_info: {
+                is_identity_verified: true,
+                reason: {
+                  description: {
+                    text: 'This account is verified',
+                    entities: [],
+                  },
+                  verified_since_msec: '1609459200000',
+                },
+              },
             },
           },
         },
