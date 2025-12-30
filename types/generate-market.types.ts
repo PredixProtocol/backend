@@ -3,6 +3,7 @@ export interface AIAnalysisResult {
   question?: string;
   description?: string;
   probability?: number;
+  suggestedEndDays?: number;
   rejectionReason?: string;
 }
 

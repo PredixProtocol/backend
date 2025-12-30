@@ -44,13 +44,15 @@ Respond with a JSON object in this exact format:
   "question": "Will [specific event] happen?",
   "description": "Detailed resolution criteria...",
   "probability": 50,
+  "suggestedEndDays": 30,
   "rejectionReason": "Why this cannot be a prediction market"
 }
 
 Rules:
 - If possible = false, ONLY fill possible and rejectionReason
 - If possible = true, DO NOT include rejectionReason
-- Probability must be an integer between 1 and 99`;
+- Probability must be an integer between 1 and 99
+- suggestedEndDays is an estimate of how many days from now the event will be verifiable (integer, e.g., 7, 30, 90)`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4.1-mini',

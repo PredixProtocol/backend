@@ -1,4 +1,5 @@
 import { analyzePostForMarket } from '../lib/ai';
+import { prisma } from '../lib/prisma';
 import type {
   GeneratedMarket,
   GenerateMarketResult,
@@ -41,6 +42,18 @@ export async function generateMarket(url: string): Promise<GenerateMarketResult>
     return {
       success: false,
       reason: 'Invalid X/Twitter URL. Please provide a valid post URL.',
+    };
+  }
+
+  const existingPost = await prisma.post.findUnique({
+    where: { pid },
+    include: { market: true },
+  });
+
+  if (existingPost) {
+    return {
+      success: false,
+      reason: 'A prediction market for this post already exists.',
     };
   }
 
@@ -101,6 +114,30 @@ export async function generateMarket(url: string): Promise<GenerateMarketResult>
   const question = aiAnalysis.question!;
   const description = aiAnalysis.description!;
   const probability = aiAnalysis.probability!;
+  const suggestedEndDays = aiAnalysis.suggestedEndDays || 7;
+
+  const existingMarket = await prisma.market.findFirst({
+    where: { question },
+  });
+
+  if (existingMarket) {
+    return {
+      success: false,
+      reason: 'A prediction market with this question already exists.',
+    };
+  }
+
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + suggestedEndDays);
+
+  const protocols = [
+    { name: 'Beefy', icon: '/images/protocol/beefy.png', apy: 12 },
+    { name: 'Dolomite', icon: '/images/protocol/dolomite.png', apy: 10 },
+    { name: 'InitCapital', icon: '/images/protocol/initcapital.png', apy: 8 },
+  ];
+  const highestApyProtocol = protocols.reduce((prev, current) =>
+    prev.apy > current.apy ? prev : current
+  );
 
   const market: GeneratedMarket = {
     id: generateMarketId(question),
@@ -141,9 +178,9 @@ export async function generateMarket(url: string): Promise<GenerateMarketResult>
       blockchainMarketId: null,
       contractAddress: null,
       tvl: null,
-      protocol: null,
-      token: null,
-      endDate: null,
+      protocol: highestApyProtocol,
+      token: { name: 'USDC', icon: '/images/token/usdc.png' },
+      endDate: endDate.toISOString(),
       totalPoolSize: null,
       totalYieldUntilEnd: null,
       createdAt: new Date().toISOString(),
