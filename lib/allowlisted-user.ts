@@ -1,5 +1,1 @@
-export const allowlistedUser = [
-    "realDonaldTrump",
-    "elonmusk",
-    
-];
+export const allowlistedUser = ['realDonaldTrump', 'elonmusk'];

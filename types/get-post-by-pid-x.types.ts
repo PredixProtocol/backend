@@ -50,29 +50,29 @@ export interface Result3 {
 }
 
 export interface VerificationInfo {
-  is_identity_verified: boolean
-  reason: Reason
+  is_identity_verified: boolean;
+  reason: Reason;
 }
 
 export interface Reason {
-  description: Description2
-  verified_since_msec: string
+  description: Description2;
+  verified_since_msec: string;
 }
 
 export interface Description2 {
-  text: string
-  entities: Entity[]
+  text: string;
+  entities: Entity[];
 }
 
 export interface Entity {
-  from_index: number
-  to_index: number
-  ref: Ref
+  from_index: number;
+  to_index: number;
+  ref: Ref;
 }
 
 export interface Ref {
-  url: string
-  url_type: string
+  url: string;
+  url_type: string;
 }
 
 export interface AffiliatesHighlightedLabel {

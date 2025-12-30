@@ -19,6 +19,21 @@ const server = Bun.serve({
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
+    if (pathname === '/') {
+      return new Response(
+        JSON.stringify({
+          name: 'Predix API',
+          version: '1.0.0',
+          status: 'running',
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        }
+      );
+    }
+
     if (pathname === '/health') {
       return new Response(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }), {
         status: 200,
@@ -26,10 +41,10 @@ const server = Bun.serve({
       });
     }
 
-    const route = matchRoute(pathname);
+    const matched = matchRoute(pathname);
 
-    if (route) {
-      const response = await route.handler(req);
+    if (matched) {
+      const response = await matched.route.handler(req, ...matched.params);
 
       const newHeaders = new Headers(response.headers);
       Object.entries(corsHeaders).forEach(([key, value]) => {
