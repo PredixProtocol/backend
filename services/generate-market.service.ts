@@ -139,6 +139,7 @@ export async function generateMarket(url: string): Promise<GenerateMarketResult>
     },
     market: {
       blockchainMarketId: null,
+      contractAddress: null,
       tvl: null,
       protocol: null,
       token: null,

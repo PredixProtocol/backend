@@ -15,6 +15,7 @@ model Market {
   blockchainMarketId Int      @unique
   totalPoolSize      String
   totalYieldUntilEnd String
+  contractAddress    String
   endDate            DateTime
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

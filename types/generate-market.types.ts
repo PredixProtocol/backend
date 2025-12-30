@@ -62,6 +62,7 @@ export interface MarketProbability {
 
 export interface MarketDetails {
   blockchainMarketId: number | null;
+  contractAddress: string | null;
   tvl: MarketTvl | null;
   protocol: MarketProtocol | null;
   token: MarketToken | null;
