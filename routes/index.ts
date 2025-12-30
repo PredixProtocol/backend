@@ -5,6 +5,7 @@ import {
   handleGetMarketById,
   handleGetMarkets,
 } from './market.route';
+import { handleSwaggerJSON, handleSwaggerUI } from './swagger.route';
 
 export interface Route {
   path: string;
@@ -13,6 +14,14 @@ export interface Route {
 }
 
 export const routes: Route[] = [
+  {
+    path: '/api-docs',
+    handler: handleSwaggerUI,
+  },
+  {
+    path: '/api-docs/json',
+    handler: handleSwaggerJSON,
+  },
   {
     path: '/api/generate-market',
     handler: handleGenerateMarket,
