@@ -130,6 +130,31 @@ export async function generateMarket(url: string): Promise<GenerateMarketResult>
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + suggestedEndDays);
 
+  let contractAddress: string | null = null;
+  let blockchainMarketId: number = Math.floor(Date.now() / 1000);
+  let vaultCreationError: string | undefined;
+
+  const { createMarketVault } = await import('./market-factory.service');
+
+  const assetAddress = (process.env['DEFAULT_ASSET_ADDRESS'] || '') as `0x${string}`;
+  const feeBPS = BigInt(process.env['DEFAULT_FEE_BPS'] || '100');
+
+  if (assetAddress) {
+    const vaultResult = await createMarketVault({
+      name: question,
+      maturity: BigInt(Math.floor(endDate.getTime() / 1000)),
+      asset: assetAddress,
+      feeBPS,
+      isOfficial: false,
+    });
+
+    if (vaultResult.success && vaultResult.marketAddress) {
+      contractAddress = vaultResult.marketAddress;
+    } else {
+      vaultCreationError = vaultResult.error;
+    }
+  }
+
   const protocols = [
     { name: 'Beefy', icon: '/images/protocol/beefy.png', apy: 12 },
     { name: 'Dolomite', icon: '/images/protocol/dolomite.png', apy: 10 },
@@ -175,8 +200,8 @@ export async function generateMarket(url: string): Promise<GenerateMarketResult>
       url,
     },
     market: {
-      blockchainMarketId: null,
-      contractAddress: null,
+      blockchainMarketId,
+      contractAddress,
       tvl: null,
       protocol: highestApyProtocol,
       token: { name: 'USDC', icon: '/images/token/usdc.png' },
@@ -184,6 +209,7 @@ export async function generateMarket(url: string): Promise<GenerateMarketResult>
       totalPoolSize: null,
       totalYieldUntilEnd: null,
       createdAt: new Date().toISOString(),
+      vaultCreationError,
     },
     actions: DEFAULT_ACTIONS,
   };

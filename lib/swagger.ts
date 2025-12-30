@@ -315,7 +315,8 @@ export const swaggerSpec = {
       post: {
         tags: ['Generate'],
         summary: 'Generate market from X/Twitter post',
-        description: 'Generate a prediction market from an X/Twitter post URL using AI',
+        description:
+          'Generate a prediction market from an X/Twitter post URL using AI. Automatically saves to database.',
         requestBody: {
           required: true,
           content: {
@@ -337,7 +338,7 @@ export const swaggerSpec = {
         },
         responses: {
           '200': {
-            description: 'Market generated successfully',
+            description: 'Market generated but failed to save to database (with warning)',
             content: {
               'application/json': {
                 schema: {
@@ -345,6 +346,29 @@ export const swaggerSpec = {
                   properties: {
                     success: { type: 'boolean', example: true },
                     data: { $ref: '#/components/schemas/GeneratedMarket' },
+                    warning: {
+                      type: 'string',
+                      example: 'Market generated but failed to save to database',
+                    },
+                    error: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          '201': {
+            description: 'Market generated and saved to database successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    data: { $ref: '#/components/schemas/Market' },
+                    message: {
+                      type: 'string',
+                      example: 'Market generated and saved to database',
+                    },
                   },
                 },
               },
@@ -627,6 +651,11 @@ export const swaggerSpec = {
               totalPoolSize: { type: 'string', nullable: true },
               totalYieldUntilEnd: { type: 'string', nullable: true },
               createdAt: { type: 'string', format: 'date-time' },
+              vaultCreationError: {
+                type: 'string',
+                nullable: true,
+                description: 'Error message if blockchain vault creation failed',
+              },
             },
           },
           actions: {
