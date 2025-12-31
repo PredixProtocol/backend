@@ -5,6 +5,7 @@ import {
   handleGetMarketById,
   handleGetMarkets,
 } from './market.route';
+import { handleGetMarketChart } from './chart.route';
 import { handleSwaggerJSON, handleSwaggerUI } from './swagger.route';
 
 export interface Route {
@@ -39,6 +40,11 @@ export const routes: Route[] = [
     path: '/api/markets/blockchain',
     pattern: /^\/api\/markets\/blockchain\/(.+)$/,
     handler: handleGetMarketByBlockchainId,
+  },
+  {
+    path: '/api/markets/:id/chart',
+    pattern: /^\/api\/markets\/([^/]+)\/chart$/,
+    handler: handleGetMarketChart,
   },
   {
     path: '/api/markets/:id',

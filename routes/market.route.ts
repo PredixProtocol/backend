@@ -5,6 +5,11 @@ import {
   getMarkets,
   type CreateMarketInput,
 } from '../services/market.service';
+import {
+  getIndexerMarketById,
+  getIndexerMarketsByIds,
+  mergeMarketWithIndexerData,
+} from '../services/indexer-market.service';
 
 export async function handleGetMarkets(req: Request): Promise<Response> {
   if (req.method !== 'GET') {
@@ -25,7 +30,24 @@ export async function handleGetMarkets(req: Request): Promise<Response> {
 
     const result = await getMarkets({ page, limit, orderBy, order });
 
-    return new Response(JSON.stringify({ success: true, ...result }), {
+    // Get contract addresses for indexer lookup
+    const contractAddresses = result.data
+      .map((m: any) => m.contractAddress)
+      .filter((addr: string | null): addr is string => !!addr);
+
+    // Fetch indexer data for all markets
+    const indexerMarketsMap = await getIndexerMarketsByIds(contractAddresses);
+
+    // Merge indexer data with database data
+    const enrichedData = result.data.map((market: any) => {
+      if (market.contractAddress) {
+        const indexerMarket = indexerMarketsMap.get(market.contractAddress.toLowerCase());
+        return mergeMarketWithIndexerData(market, indexerMarket || null);
+      }
+      return market;
+    });
+
+    return new Response(JSON.stringify({ success: true, ...result, data: enrichedData }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -62,7 +84,14 @@ export async function handleGetMarketById(req: Request, id: string): Promise<Res
       });
     }
 
-    return new Response(JSON.stringify({ success: true, data: market }), {
+    // Fetch indexer data if market has a contract address
+    let enrichedMarket = market;
+    if ((market as any).contractAddress) {
+      const indexerMarket = await getIndexerMarketById((market as any).contractAddress);
+      enrichedMarket = mergeMarketWithIndexerData(market, indexerMarket);
+    }
+
+    return new Response(JSON.stringify({ success: true, data: enrichedMarket }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
