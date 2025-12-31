@@ -1,4 +1,4 @@
-import { decodeEventLog, type Address } from 'viem';
+import { decodeEventLog, TransactionReceiptNotFoundError, type Address, type Hash } from 'viem';
 import {
   createWalletClientFromPrivateKey,
   MARKET_FACTORY_ADDRESS,
@@ -21,6 +21,37 @@ export interface CreateMarketVaultResult {
   transactionHash?: string;
   blockNumber?: bigint;
   error?: string;
+}
+
+async function waitForReceiptWithRetry(
+  hash: Hash,
+  {
+    pollingIntervalMs = 5_000,
+    timeoutMs = 300_000,
+  }: { pollingIntervalMs?: number; timeoutMs?: number } = {}
+) {
+  const startedAt = Date.now();
+
+  for (;;) {
+    try {
+      const receipt = await publicClient.getTransactionReceipt({ hash });
+      return receipt;
+    } catch (err) {
+      if (err instanceof TransactionReceiptNotFoundError) {
+        if (Date.now() - startedAt > timeoutMs) {
+          throw new Error(
+            `Timed out waiting for transaction receipt for hash ${hash} after ${timeoutMs}ms`
+          );
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, pollingIntervalMs));
+        continue;
+      }
+
+      // Any non-"not found" error is unexpected and should bubble up.
+      throw err;
+    }
+  }
 }
 
 export async function createMarketVault(
@@ -48,9 +79,7 @@ export async function createMarketVault(
       account: walletClient.account,
     });
 
-    const receipt = await publicClient.waitForTransactionReceipt({
-      hash,
-    });
+    const receipt = await waitForReceiptWithRetry(hash);
 
     let marketAddress: Address | undefined;
 
