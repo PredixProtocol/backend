@@ -71,7 +71,6 @@ export interface MarketDetails {
   totalPoolSize: string | null;
   totalYieldUntilEnd: string | null;
   createdAt: string;
-  vaultCreationError?: string;
 }
 
 export interface MarketAction {

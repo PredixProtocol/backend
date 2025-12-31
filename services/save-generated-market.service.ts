@@ -1,5 +1,5 @@
-import { createMarket, type CreateMarketInput } from './market.service';
 import type { GeneratedMarket } from '../types/generate-market.types';
+import { createMarket, type CreateMarketInput } from './market.service';
 
 export interface SaveGeneratedMarketResult {
   success: boolean;

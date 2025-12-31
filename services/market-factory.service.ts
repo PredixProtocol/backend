@@ -1,9 +1,9 @@
 import { decodeEventLog, type Address } from 'viem';
 import {
   createWalletClientFromPrivateKey,
+  MARKET_FACTORY_ADDRESS,
   MARKET_FACTORY_COMMUNITY_ABI,
   MARKET_FACTORY_OFFICIAL_ABI,
-  MARKET_FACTORY_ADDRESS,
   publicClient,
 } from '../config/contracts';
 

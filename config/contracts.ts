@@ -1,6 +1,6 @@
 import { createPublicClient, createWalletClient, http, type Address } from 'viem';
-import { mantleSepoliaTestnet } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
+import { mantleSepoliaTestnet } from 'viem/chains';
 
 export const MARKET_FACTORY_COMMUNITY_ABI = [
   {
@@ -26,7 +26,7 @@ export const MARKET_FACTORY_COMMUNITY_ABI = [
       { name: 'maturity', type: 'uint256', indexed: false, internalType: 'uint256' },
       { name: 'asset', type: 'address', indexed: false, internalType: 'address' },
     ],
-  }
+  },
 ] as const;
 
 export const MARKET_FACTORY_OFFICIAL_ABI = [
@@ -53,7 +53,7 @@ export const MARKET_FACTORY_OFFICIAL_ABI = [
       { name: 'maturity', type: 'uint256', indexed: false, internalType: 'uint256' },
       { name: 'asset', type: 'address', indexed: false, internalType: 'address' },
     ],
-  }
+  },
 ] as const;
 
 export const MARKET_FACTORY_ADDRESS = '0xCc712b4d60fefFC16d5b89F533A7681e76B399d8' as Address;
@@ -62,7 +62,6 @@ export const publicClient = createPublicClient({
   chain: mantleSepoliaTestnet,
   transport: http(),
 });
-
 
 export function createWalletClientFromPrivateKey(privateKey: string) {
   const account = privateKeyToAccount(privateKey as `0x${string}`);
